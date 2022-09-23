@@ -1,0 +1,306 @@
+import 'package:final_project/Screens/sign_in.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart';
+import 'package:provider/provider.dart';
+
+import '../Models/Colors/colors.dart';
+import '../Providers/sign_up_provider.dart';
+import 'locations.dart';
+
+class SignUp extends StatelessWidget {
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    SignUpProvider signUpProvider = Provider.of<SignUpProvider>(context);
+
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(0.01.sw),
+              child: Container(
+                width: double.infinity,
+                child: Image.asset(
+                  "assets/images/BackGround.png",
+                  fit: BoxFit.fill,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      CustomColors.background,
+                      CustomColors.cyanAcent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Column(
+              children: [
+                SizedBox(height: 0.12.sh,),
+                Image.asset("assets/images/LogoForm.png",alignment: Alignment.center,),
+                SizedBox(
+                  height: 0.034.sh,
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 0.055.sw),
+                  child: Stack(
+                    children: [
+                      Image.asset("assets/images/BGSignUp.png"),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 0.08.sh,
+                            ),
+                            Center(
+                              child: Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                    fontSize: 24.sp, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: 0.021.sh),
+                              width: 0.83.sw,
+                              alignment: Alignment.center,
+                              child: TextFormField(
+                                keyboardType: TextInputType.name,
+                                decoration: const InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  hintText: 'Name ',
+                                  hintStyle: TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                onSaved: (value){
+                                  signUpProvider.ChangeName(value!);
+                                },
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: 0.021.sh),
+                              width: 0.83.sw,
+                              alignment: Alignment.center,
+                              child: TextFormField(
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: const InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  hintText: 'Email ',
+                                  hintStyle: TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null ||
+                                      value.isEmpty ||
+                                      !value.contains("@")) {
+                                    return "Enter Valid Email";
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value){
+                                  signUpProvider.ChangeEmail(value!);
+                                },
+                              ),
+                            ),
+                            Container(
+                              width: 0.83.sw,
+                              padding: EdgeInsets.only(left: 0.021.sh),
+                              alignment: Alignment.center,
+                              child: TextFormField(
+                                obscureText: true,
+                                decoration: const InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  hintText:'Password ',
+                                  hintStyle: TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null ||
+                                      value.isEmpty) {
+                                    return "Enter Valid Password";
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value){
+                                  signUpProvider.ChangePassword(value!);
+                                },
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: 0.021.sh),
+                              width: 0.83.sw,
+                              alignment: Alignment.center,
+                              child: TextFormField(
+                                keyboardType: TextInputType.phone,
+                                decoration: const InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  hintText: 'Phone Number ',
+                                  hintStyle: TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                onSaved: (value){
+                                  signUpProvider.ChangePhoneNumber(value!);
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              height: 0.01.sh,
+                            ),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  activeColor: CustomColors.background,
+                                  value: signUpProvider.agreement,
+                                  onChanged: (value){
+                                    signUpProvider.ChangeAgreement(true);
+                                  },
+                                ),
+                                RichText(
+                                    text:TextSpan(
+                                     text: "I agree the ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text: "Terms & Conditions ",
+                                          style: TextStyle(
+                                            color: CustomColors.background,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 0.01.sh,
+                            ),
+                            Stack(
+                              children: [
+                                Container(
+                                  width: 0.84.sw,
+                                  height: 0.08.sh,
+                                  child: signUpProvider.isLoading? Center(child: CircularProgressIndicator(),): ElevatedButton(
+                                    child: Text(
+                                      "Sign Up",
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
+                                      ),
+                                    ),
+                                    onPressed: signUpProvider.agreement ?() {
+                                      if(_formKey.currentState!.validate()){
+                                        _formKey.currentState!.save();
+                                        Signup(signUpProvider,context);
+                                      }
+                                    }:null,
+                                    style: ButtonStyle(
+                                      elevation: MaterialStateProperty.all(8),
+                                      backgroundColor:
+                                      MaterialStateProperty.all(
+                                          CustomColors.background),
+                                      shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(100),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                    padding: EdgeInsets.only(left: 0.66.sw,top: 0.003.sh),
+                                    child: Image.asset(
+                                      "assets/images/Cricle.png",
+                                      alignment:
+                                      AlignmentDirectional.centerStart,
+                                    )),
+                                Container(
+                                  padding: EdgeInsets.only(left: 0.66.sw),
+                                  child: Image.asset(
+                                    "assets/images/right-arrow.png",
+                                    width: 0.15.sw,
+                                    height: 0.08.sh,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 0.05.sh,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(right: 0.085.sw),
+                      child: Image.asset("assets/images/Facebook.png"),
+                    ),
+                    Image.asset("assets/images/Google.png"),
+                  ],
+                ),
+                SizedBox(
+                  height: 0.03.sh,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => SignIn()));
+                  },
+                  child: Text(
+                    "Already have an account? Login",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future Signup(SignUpProvider signUpProvider,context) async{
+    signUpProvider.ChangeIsLoading(true);
+
+    Response signUpResponse = await post(Uri.parse("http://alcaptin.com/api/register"),body: {
+      'first_name':signUpProvider.name,
+      'last_name' :signUpProvider.name,
+      'email':signUpProvider.email,
+      'password':signUpProvider.password,
+      'phone_number':signUpProvider.phoneNumber,
+      'age':'22',
+      'gender':'Female'
+    },);
+
+    print(signUpResponse.statusCode.toString());
+    if(signUpResponse.statusCode == 200){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Locations()));
+    }
+    else{
+      print("Error in Data");
+    }
+
+    print("Response is : ${signUpResponse.body}");
+    print("Email is : ${signUpProvider.email}");
+    print("Password is : ${signUpProvider.password}");
+
+    signUpProvider.ChangeIsLoading(false);
+  }
+
+}
