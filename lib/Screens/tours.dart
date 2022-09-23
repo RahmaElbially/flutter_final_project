@@ -735,7 +735,7 @@ class _ToursState extends State<Tours> {
                         height: 0.03.sh,
                       ),
                       SizedBox(
-                        height: 0.4.sh,//300
+                        height: 0.5.sh,//300
                         child: ListView.builder(
                           itemBuilder: (value, index) {
                             return ListviewDiscover[index];
